@@ -28,6 +28,6 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() dto: LoginDTO) {
-    return await this._authService.login(dto);
+    return await this._authService.validateUser(dto);
   }
 }

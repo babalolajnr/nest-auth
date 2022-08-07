@@ -10,7 +10,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 @Injectable()
 export class AuthService {
-  constructor(private _prismaService: PrismaService) {}
+  constructor(private prismaService: PrismaService) {}
 
   async register(
     dto: RegisterUserDTO,
@@ -19,7 +19,7 @@ export class AuthService {
     const { name, email } = dto;
 
     try {
-      const user = await this._prismaService.user.create({
+      const user = await this.prismaService.user.create({
         data: { name, email, password: hash },
         select: {
           name: true,
@@ -39,10 +39,10 @@ export class AuthService {
     }
   }
 
-  async login(dto: LoginDTO) {
+  async validateUser(dto: LoginDTO) {
     const { email, password } = dto;
 
-    const user = await this._prismaService.user.findUnique({
+    const user = await this.prismaService.user.findUnique({
       where: { email },
     });
 
@@ -52,6 +52,6 @@ export class AuthService {
 
     if (!match) throw new BadRequestException('Email/Password is Invalid');
 
-    return 'logged in';
+    return user;
   }
 }
