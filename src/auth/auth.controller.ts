@@ -1,14 +1,21 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
-import { Response } from 'express';
+import {
+  Body,
+  Controller,
+  Post,
+  Request,
+  Response,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDTO, RegisterUserDTO } from './dto';
+import { RegisterUserDTO } from './dto';
+import { LocalAuthGuard } from './guards';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private _authService: AuthService) {}
+  constructor(private authService: AuthService) {}
 
   @Post('register')
-  async register(@Body() dto: RegisterUserDTO, @Res() response: Response) {
+  async register(@Body() dto: RegisterUserDTO, @Response() response: any) {
     if (dto.password != dto.confirm_password) {
       return response.status(400).json({
         statusCode: 400,
@@ -17,7 +24,7 @@ export class AuthController {
       });
     }
 
-    const user = await this._authService.register(dto);
+    const user = await this.authService.register(dto);
 
     return response.status(201).json({
       statusCode: 201,
@@ -26,8 +33,14 @@ export class AuthController {
     });
   }
 
+  @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Body() dto: LoginDTO) {
-    return await this._authService.validateUser(dto);
+  async login(@Request() req: any) {
+    return this.authService.login(req.user);
   }
+
+  // @Post('login')
+  // async login(@Body() dto: LoginDTO) {
+  //   return await this.authService.validateUser(dto);
+  // }
 }

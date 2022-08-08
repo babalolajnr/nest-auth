@@ -7,10 +7,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { LoginDTO, RegisterUserDTO } from './dto';
 import * as argon2 from 'argon2';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private jwtService: JwtService,
+  ) {}
 
   async register(
     dto: RegisterUserDTO,
@@ -53,5 +57,13 @@ export class AuthService {
     if (!match) throw new BadRequestException('Email/Password is Invalid');
 
     return user;
+  }
+
+  async login(user: any) {
+    const payload = { email: user.email, sub: user.id };
+
+    return {
+      bearer_token: this.jwtService.sign(payload),
+    };
   }
 }
