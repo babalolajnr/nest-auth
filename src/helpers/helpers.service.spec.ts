@@ -19,4 +19,8 @@ describe('HelpersService', () => {
   it('should slugify a string', () => {
     expect(service.slugify('Grade 1')).toBe('grade-1');
   });
+
+  it('should slugify a string with custom link', () => {
+    expect(service.slugify('Grade 1', '+')).toBe('grade+1');
+  });
 });
