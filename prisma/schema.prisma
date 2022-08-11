@@ -11,14 +11,72 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  name      String    @db.VarChar(50)
-  password  String
+  id       String @id @default(uuid())
+  email    String @unique
+  name     String @db.VarChar(50)
+  password String
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-  // posts Post[]
 
   @@map("users")
+}
+
+model Student {
+  id              String      @id @default(uuid())
+  name            String      @db.VarChar(50)
+  slug            String      @unique @db.VarChar(50)
+  branchClass    BranchClass @relation(fields: [branchClassId], references: [id])
+  branchClassId String
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@map("students")
+}
+
+model Class {
+  id   String @id @default(uuid())
+  name String @unique @db.VarChar(50)
+  slug String @unique @db.VarChar(50)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  BranchClass BranchClass[]
+
+  @@map("classes")
+}
+
+model Branch {
+  id   String @id @default(uuid())
+  name String @unique @db.VarChar(50)
+  slug String @unique @db.VarChar(50)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  BranchClass BranchClass[]
+
+  @@map("branches")
+}
+
+model BranchClass {
+  id        String @id @default(uuid())
+  class     Class  @relation(fields: [classId], references: [id])
+  classId  String
+  branch    Branch @relation(fields: [branchId], references: [id])
+  branchId String
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  Student   Student[]
+
+  @@map("branch_class")
+  @@index([classId, branchId])
 }
